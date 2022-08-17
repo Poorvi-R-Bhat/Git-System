@@ -1,0 +1,41 @@
+#To fetchthe Employee Name from the Reports to in the Employee
+frappe.ui.form.on("Tour Report","validate",function(frm,cdt,cdn){
+
+var d = locals[cdt][cdn];
+    frappe.call({
+    method: 'frappe.client.get_value',
+    args: {
+             'doctype': 'Employee',
+             'filters': {'name': frm.doc.selco_reports_to},
+             'fieldname': [
+             'employee_name'
+         ]
+        },
+    callback: function(data) {
+                 if (!data.exc) {
+                frappe.model.set_value(d.doctype,d.name,"selco_reporting_manager_name", data.message.employee_name);
+                 frm.refresh_field('selco_reports_to');
+
+           }
+        }
+    });
+});
+
+#To calculate the Sum in the Child Table on Refresh
+frappe.ui.form.on("HR Earnings", {
+   selco_amount:function(frm, cdt, cdn){
+   var d = locals[cdt][cdn];
+   var total = 0;
+   frm.doc.selco_hr_earnings.forEach(function(d) { total += d.selco_amount; });
+   frm.set_value("selco_sum_of_earnings", total);
+   refresh_field("selco_sum_of_earnings");
+ },
+   selco_hr_earnings_remove:function(frm, cdt, cdn){
+   var d = locals[cdt][cdn];
+   var total = 0;
+   frm.doc.selco_hr_earnings.forEach(function(d) { total += d.selco_amount; });
+   frm.set_value("selco_sum_of_earnings", total);
+   refresh_field("selco_sum_of_earnings");
+   	}
+   });
+
